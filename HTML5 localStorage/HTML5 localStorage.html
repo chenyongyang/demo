@@ -1,0 +1,292 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<title>HTML5的本地存储功能，使用localStorage</title>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<link href="https://cdn.bootcss.com/bootstrap/4.0.0-beta/css/bootstrap-grid.css" rel="stylesheet">
+</head>
+<body>
+<!-- 
+	localStorage的存储位置在：C:\Users\Administrator\AppData\Local\Google\Chrome\User Data\Default\Local Storage
+	需要注意的是：	localStorage是基于浏览器的，不同的浏览器所保存的数据是不互通的！
+	比如：在chrome浏览器保存的数据，在firefox打开同一个页面，将不能查找到chrome所保存的数据
+-->
+<div class="container-fluid">
+	<div class="row header-row">
+		<div class="col-xs-12 col-sm-12 col-md-12 col-lg-12 text-center">
+			<h1>使用localStorage存储数据</h1>
+		</div>
+	</div>
+	
+	<div class="row container-row">
+		<!-- 左侧表单界面 -->
+		<div class="col-xs-5 col-sm-5 col-md-5 col-lg-5">
+			<h1 class="text-center">输入用户数据</h1><br>
+			<form class="form" name="user_form">
+				<input type="hidden" id="user_id" value="" />
+				<div class="form-group">
+					<div class="col-xs-4 col-sm-4 col-md-4 col-lg-4 text-right">
+						<label>姓名:</label>
+					</div>
+					<div class="col-xs-8 col-sm-8 col-md-8 col-lg-8">
+						<input type="text" id="user_name" class="form-control" placeholder="请输入用户的名称" />
+					</div>
+				</div>
+				<div class="form-group">
+					<div class="col-xs-4 col-sm-4 col-md-4 col-lg-4 text-right">
+						<label>性别:</label>
+					</div>
+					<div class="col-xs-8 col-sm-8 col-md-8 col-lg-8">
+						<label class="radio-inline"><input type="radio" id="sex1" name="user_sex" value="0" />男</label>
+						<label class="radio-inline"><input type="radio" id="sex2" name="user_sex" value="1" />女</label>
+					</div>
+				</div>
+				<div class="form-group">
+					<div class="col-xs-4 col-sm-4 col-md-4 col-lg-4 text-right">
+						<label>年龄:</label>
+					</div>
+					<div class="col-xs-8 col-sm-8 col-md-8 col-lg-8">
+						<input type="text" id="user_age" class="form-control" placeholder="请输入用户的年龄" />
+					</div>
+				</div>
+				<div class="form-group">
+					<div class="col-xs-4 col-sm-4 col-md-4 col-lg-4 text-right">
+						<label>地址:</label>
+					</div>
+					<div class="col-xs-8 col-sm-8 col-md-8 col-lg-8">
+						<input type="text" id="user_address" class="form-control" placeholder="请输入用户的地址" />
+					</div>
+				</div>
+				<div class="form-group">
+					<div class="col-xs-4 col-sm-4 col-md-4 col-lg-4 text-right">
+						<label>手机号:</label>
+					</div>
+					<div class="col-xs-8 col-sm-8 col-md-8 col-lg-8">
+						<input type="text" id="user_phone" class="form-control" placeholder="请输入用户的手机号" />
+					</div>
+				</div>
+				<div class="form-group">
+					<div class="col-xs-6 col-sm-6 col-md-6 col-lg-6 text-right">
+						<button type="button" class="btn btn-warning" onclick="document.user_form.reset();document.getElementById('user_id').value='';">清空表单</button>
+					</div>
+					<div class="col-xs-6 col-sm-6 col-md-6 col-lg-6 text-center">
+						<button type="button" class="btn btn-info" onclick="save();">保存数据</button>
+					</div>
+				</div>
+			</form>
+		</div>
+		<!-- 右侧列表界面 -->
+		<div class="col-xs-7 col-sm-7 col-md-7 col-lg-7">
+			<div class="row text-center">
+				<div class="col-xs-9 col-sm-9 col-md-9 col-lg-9">
+					<h1 class="text-center">用户数据列表</h1><br>
+				</div>
+				<div class="col-xs-3 col-sm-3 col-md-3 col-lg-3">
+					<button type="button" class="btn btn-info" style="margin-top: 11%;" onclick="clearData();">清空列表</button>
+				</div>
+			</div>
+			<table class="table table-bordered text-center">
+				<thead>
+					<tr>
+						<th>编号</th>
+						<th>姓名</th>
+						<th>性别</th>
+						<th>年龄</th>
+						<th>地址</th>
+						<th>手机号</th>
+						<th>操作</th>
+					</tr>
+				</thead>
+				<tbody id="table_tbody"></tbody>
+			</table>
+		</div>
+	</div>
+</div>
+
+<script type="text/javascript">
+find();
+function save(){
+	var name = document.getElementById("user_name").value;
+	var sex = getSex();
+	var age = document.getElementById("user_age").value;
+	var address = document.getElementById("user_address").value;
+	var phone = document.getElementById("user_phone").value;
+	
+	if(name==""){
+		alert("请输入名称");
+		document.getElementById("user_name").focus();
+		return;
+	}else if(age==""){
+		alert("请输入年龄");
+		document.getElementById("user_age").focus();
+		return;
+	}else if(address==""){
+		alert("请输入地址");
+		document.getElementById("user_address").focus();
+		return;
+	}else if(phone==""){
+		alert("请输入手机号");
+		document.getElementById("user_phone").focus();
+		return;
+	}
+	
+	var map = new Object();
+	map.name = name;
+	map.sex = sex;
+	map.age = age;
+	map.address = address;
+	map.phone = phone;
+	
+	var key = "";
+	if(document.getElementById("user_id").value==""){
+		key = createKey();
+	}else {
+		key = document.getElementById("user_id").value;
+	}
+	localStorage.setItem(key, JSON.stringify(map));
+	/*
+	 把对象转化为json字符串，本地存储数据必须为字符串形式（对象也是一种数据结构，如何选择合适的数据结构？数组的索引是单纯的数字，而对象的索引更有意义，这里需要的是有意义的索引，所以使用对象来做数据结构
+	*/
+	find();
+	alert("保存成功");//JavaScript不是单线程的吗？为何这里是先弹窗再显示数据，与代码的执行顺序不符？
+	document.user_form.reset();
+}
+
+function editData(key){
+	var obj = JSON.parse(localStorage.getItem(key));
+	document.getElementById("user_id").value = key;
+	document.getElementById("user_name").value = obj.name;
+	document.getElementById("user_age").value = obj.age;
+	document.getElementById("user_address").value = obj.address;
+	document.getElementById("user_phone").value = obj.phone;
+	setRadioChecked(obj.sex);
+}
+
+function find(){
+	document.getElementById("user_id").value = "";
+	var node_body = document.getElementById("table_tbody");
+	node_body.innerHTML = "";
+	var nodeArray = [];
+	
+	var num = 1;
+	for(var i=0; i<localStorage.length; i++){
+		var obj = JSON.parse(localStorage.getItem(localStorage.key(i)));
+		var node_tr = document.createElement("tr");
+		var node_td_num = document.createElement("td");
+		var node_td_name = document.createElement("td");
+		var node_td_sex = document.createElement("td");
+		var node_td_age = document.createElement("td");
+		var node_td_address = document.createElement("td");
+		var node_td_phone = document.createElement("td");
+		var node_td_oper = document.createElement("td");
+
+		var node_button_del = document.createElement("button");
+		node_button_del.type = "button";
+		node_button_del.value = localStorage.key(i);
+		node_button_del.className = "btn btn-danger";
+		node_button_del.innerHTML = "删除";
+		node_button_del.onclick = function(){
+			singleDelete(this.value);
+		};
+		
+		var node_button_edit = document.createElement("button");
+		node_button_edit.type = "button";
+		node_button_edit.value = localStorage.key(i);
+		node_button_edit.className = "btn btn-primary";
+		node_button_edit.innerHTML = "编辑";
+		node_button_edit.onclick = function(){
+			editData(this.value);
+		};
+		
+		node_td_num.innerHTML = num;
+		node_td_name.innerHTML = obj.name;
+		node_td_sex.innerHTML = obj.sex;
+		node_td_age.innerHTML = obj.age;
+		node_td_address.innerHTML = obj.address;
+		node_td_phone.innerHTML = obj.phone;
+		node_td_oper.appendChild(node_button_del);
+		node_td_oper.appendChild(node_button_edit);
+		
+		
+		node_tr.appendChild(node_td_num);
+		node_tr.appendChild(node_td_name);
+		node_tr.appendChild(node_td_sex);
+		node_tr.appendChild(node_td_age);
+		node_tr.appendChild(node_td_address);
+		node_tr.appendChild(node_td_phone);
+		node_tr.appendChild(node_td_oper);
+		
+		nodeArray.push(node_tr);
+		
+		num++;
+	}
+	
+	for(var i=0; i<nodeArray.length; i++){
+		node_body.appendChild(nodeArray[i]);
+	}
+}
+
+function clearData(){
+	localStorage.clear();
+	find();
+}
+
+/*
+将本地存储删除后，应该如何更新视图？这里重新查询了一遍本地存储并显示数据。这里涉及到重绘，是否影响性能？
+我的想法是，删除本地存储后删除该节点。
+开始有点数据驱动视图的感觉了
+*/
+function singleDelete(key){
+	if(confirm("确定要删除吗？")){
+		localStorage.removeItem(key);
+		find();
+	}
+}
+
+function setRadioChecked(val){
+	if(val == "男"){
+		val = 0;
+	}else if(val == "女"){
+		val = 1;
+	}
+	var chkObjs = document.getElementsByName("user_sex");
+	for(var i=0;i<chkObjs.length;i++){
+		if(chkObjs[i].value==val){
+			chkObjs[i].checked = true;
+			break;
+		}
+	}
+}
+
+function getSex(){
+	var chk = -1,sex="";
+	var chkObjs = document.getElementsByName("user_sex");
+	for(var i=0;i<chkObjs.length;i++){
+		if(chkObjs[i].checked){
+			chk = i;
+			break;
+		}
+	}
+	
+	if(chk==0){
+		sex = "男";
+	}else if(chk==1){
+		sex = "女";
+	}else{
+		sex = "未知";
+	}
+	return sex;
+}
+
+function createKey(){
+	var str = "";
+	for(var i=0; i<10; i++){
+		str += Math.floor(Math.random()*10);
+	}
+	str += Date.parse(new Date());//解析日期时间字符串并返回毫秒数
+	return str;
+}
+</script>
+</body>
+</html>
