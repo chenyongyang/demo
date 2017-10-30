@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html lang="zh-CN">
 <head>
-<title>HTML5的本地存储功能，使用localStorage</title>
+<title>HTML5 localStorage</title>
 <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <link href="https://cdn.bootcss.com/bootstrap/4.0.0-beta/css/bootstrap-grid.css" rel="stylesheet">
@@ -105,6 +105,10 @@
 </div>
 
 <script type="text/javascript">
+/*
+每次重新加载页面时遍历一次本地存储，并将数据渲染出来。
+对页面数据进行增删改的同时，也对本地存储的数据进行增删改，实现了每次加载都显示最新状态的数据。
+ */
 find();
 function save(){
 	var name = document.getElementById("user_name").value;
@@ -217,7 +221,7 @@ function find(){
 		node_tr.appendChild(node_td_phone);
 		node_tr.appendChild(node_td_oper);
 		
-		nodeArray.push(node_tr);
+		nodeArray.push(node_tr);//将动态生成的节点暂时存储在数组中，再循环遍历渲染
 		
 		num++;
 	}
